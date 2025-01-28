@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import { dbConnect } from './db/index.js'
 const app = express()
-const port = 5000
+
 const hostname = '127.0.0.1'
 
 dotenv.config(
@@ -13,10 +13,23 @@ dotenv.config(
 
 
 dbConnect()
+  .then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+      console.log(`Server is running at port ${process.env.PORT}`)
+    })
+  })
+  .catch(
+    (err) => {
+      console.log(' connection failed', err)
+    }
+  )
+
+
+
 app.get('/', (req, res) => {
   res.send('Hello  World!')
 })
 
-app.listen(port, () => {
-  console.log(`App listening on port http://${hostname}:${port}`)
-})
+// app.listen(process.env.PORT, () => {
+//   console.log(`App listening on port http://${hostname}:${port}`)
+// })
