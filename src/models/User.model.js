@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-
     email: {
       type: String,
       required: true,
@@ -25,8 +24,10 @@ const userSchema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       default: false
+    },
+    refresh_token: {
+      type: String
     }
-
 
   },
 
@@ -37,7 +38,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next;
-  this.password = bcryptjs.hash(this.password, 10)
+  this.password = await bcryptjs.hash(this.password, 10)
   next()
 })
 
@@ -46,7 +47,7 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 }
 
 userSchema.methods.generateAccessToken = function () {
-  jwt.sign(
+  return jwt.sign(
     {
       _id: this._id,
       email: this.email,
@@ -54,13 +55,13 @@ userSchema.methods.generateAccessToken = function () {
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+      expiresIn: "1d"
     }
   )
 }
 
 userSchema.methods.generateRefreshToken = function () {
-  jwt.sign(
+  return jwt.sign(
     {
       _id: this._id,
       email: this.email,
@@ -68,7 +69,7 @@ userSchema.methods.generateRefreshToken = function () {
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+      expiresIn: "10d"
     }
   )
 }
