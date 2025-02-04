@@ -3,7 +3,7 @@ import { User } from "../models/User.model.js"
 
 export const VerifyToken = async (req, res, next) => {
   try {
-    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer", "")
+    const token = req.cookies?.accessToken
     if (!token) {
       res.status(401).json({
         message: "Unauthorized request"
@@ -15,7 +15,7 @@ export const VerifyToken = async (req, res, next) => {
     const user = await User.findById(decodedToken?._id).select("-password -refresh_token")
 
     if (!user) {
-      res.status().json({
+      res.status(404).json({
         message: "User not found"
       })
     }
