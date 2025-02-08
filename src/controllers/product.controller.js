@@ -48,18 +48,18 @@ const fetchProducts = async (req, res) => {
     let page = parseInt(req.query.page) || 1
     let category = req.query.category
 
-    let sortBy = {
-      createdAt: -1,
-    };
+    87
+
+
     let productFilter = {}
     if (category) {
       productFilter.Categories = category
     }
 
     let products = await Product.find(productFilter)
-      .sort(sortBy)
       .skip((page - 1) * perPage)
       .limit(perPage)
+
 
     let totalProducts = await Product.countDocuments(productFilter)
 
