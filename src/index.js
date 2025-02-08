@@ -4,6 +4,7 @@ import { dbConnect } from './db/index.js'
 import cors from "cors"
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
+import productRoutes from './routes/product.routes.js'
 
 const app = express()
 
@@ -48,5 +49,6 @@ app.get('/', (req, res) => {
   res.send('Hello  World!')
 })
 app.use('/api/v1/auth', userRoutes)
+app.use('/api/v1/products', productRoutes)
 
 
