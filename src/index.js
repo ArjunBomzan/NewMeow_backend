@@ -49,6 +49,6 @@ app.get('/', (req, res) => {
   res.send('Hello  World!')
 })
 app.use('/api/v1/auth', userRoutes)
-app.use('/api/v1/products', productRoutes)
+app.use('/api/v1/product', productRoutes)
 
 

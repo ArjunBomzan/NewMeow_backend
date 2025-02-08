@@ -41,6 +41,41 @@ const addProduct = async (req, res) => {
   }
 }
 
+const fetchProducts = async (req, res) => {
+  try {
+
+    let perPage = parseInt(req.query.perPage) || 5
+    let page = parseInt(req.query.page) || 1
+    let category = req.query.category
+
+    let sortBy = {
+      createdAt: -1,
+    };
+    let productFilter = {}
+    if (category) {
+      productFilter.Categories = category
+    }
+
+    let products = await Product.find(productFilter)
+      .sort(sortBy)
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+
+    let totalProducts = await Product.countDocuments(productFilter)
+
+    res.status(200).json({
+      page: page,
+      perPage: perPage,
+      total: totalProducts,
+      data: products
+    })
+  } catch (error) {
+    console.log("error while fetch products", error)
+    res.status(500).json({ message: "Something went wrong" })
+  }
+
+}
 
 
-export { addProduct }
+
+export { addProduct, fetchProducts }
