@@ -1,11 +1,13 @@
 import { Product } from '../models/Product.model.js'
 import { User } from '../models/User.model.js'
+import fs from 'fs'
+import path from 'path'
 
 const addProduct = async (req, res) => {
   try {
-    const { title, description, price, in_stock, Categories, rating } = req.body
+    const { title, description, price, in_stock, Categories, rating } = req.body;
     console.log('files', req.file)
-    const imagePath = `/uploads/images/${req.file.filename}`
+    const imagePath = `/public/images/${req.file.filename}`
 
     const Admin = await User.findById(req.user._id)
     console.log('ad', Admin)
@@ -48,12 +50,10 @@ const fetchProducts = async (req, res) => {
     let page = parseInt(req.query.page) || 1
     let category = req.query.category
 
-    87
-
-
     let productFilter = {}
     if (category) {
       productFilter.Categories = category
+
     }
 
     let products = await Product.find(productFilter)
@@ -76,6 +76,40 @@ const fetchProducts = async (req, res) => {
 
 }
 
+const deleteProduct = async (req, res) => {
+  try {
+
+    const admin = await User.findById(req.user._id)
+    if (!admin.isAdmin) {
+      return res.status(401).json({ message: "Unauthorized request" })
+    }
+
+    console.log('params', req.params)
+    const product = await Product.findById(req.params._id)
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" })
+    }
+    await Product.deleteOne({ _id: req.params._id })
+    if (product.image) {
+
+      console.log('absolue path', path.resolve())
+      console.log('image path', product.image)
+      const imagePath = path.join(path.resolve(), product.image)
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error('Error deleting file:', err)
+        }
+      })
+    }
+
+    res.status(200).json({ message: "Product deleted successfully" })
+  } catch (error) {
+    console.error("Product deleting error", error)
+    res.status(500).json({ message: "Something went wrong" })
+  }
+}
 
 
-export { addProduct, fetchProducts }
+
+
+export { addProduct, fetchProducts, deleteProduct }
