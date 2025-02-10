@@ -5,6 +5,7 @@ import cors from "cors"
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
 import productRoutes from './routes/product.routes.js'
+import orderRoutes from './routes/order.routes.js'
 
 const app = express()
 
@@ -50,5 +51,5 @@ app.get('/', (req, res) => {
 })
 app.use('/api/v1/auth', userRoutes)
 app.use('/api/v1/product', productRoutes)
-
+app.use('/api/v1/order', orderRoutes)
 
