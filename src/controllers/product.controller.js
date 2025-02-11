@@ -79,8 +79,9 @@ const fetchProducts = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
 
-    const admin = await User.findById(req.user._id)
-    if (!admin.isAdmin) {
+    const Admin = await User.findById(req.user._id)
+    console.log('Admin', Admin)
+    if (!Admin.isAdmin) {
       return res.status(401).json({ message: "Unauthorized request" })
     }
 

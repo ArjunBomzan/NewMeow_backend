@@ -21,28 +21,57 @@ const createOrder = async (req, res) => {
         product_id: dbProduct._id,
         name: dbProduct.title,
         price: dbProduct.price,
-        quantity: product.quantity
+        quantity: product.quantity || 1
       })
 
+
     }
+
+    console.log('myap', mapped_products)
 
     const order = await Order.create({
       products: mapped_products,
       created_by: req.user._id
     })
 
-    res.status(201).json({
+    return res.status(201).json({
       data: order,
       message: "Order Created Successfully"
     })
   } catch (error) {
     console.log("Error in creating order", error)
-    res.status(500).json({
+    return res.status(500).json({
       message: "Wrobd"
     })
   }
 }
 
+const getAllOrder = async (req, res) => {
+  try {
+    const Admin = await User.findById(req.user._id)
+    if (!Admin.isAdmin) {
+      return res.status(403).json({ message: "forbidden request" })
+    }
+
+    const orders = await Order.find().populate("created_by")
+
+    console.log('orders', orders)
+
+    return res.status(200).json({
+      data: orders,
+      message: "orders fetched successfully"
+    })
+  } catch (error) {
+    console.log('error in order', error);
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
+  }
+}
+
+
+
 export {
-  createOrder
+  createOrder,
+  getAllOrder
 }
