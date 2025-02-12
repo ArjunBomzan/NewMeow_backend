@@ -1,4 +1,6 @@
 import { User } from "../models/User.model.js"
+import fs from "fs";
+
 
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -22,11 +24,17 @@ const userRegister = async (req, res) => {
   try {
     const { email, password, fullname } = req.body
     const isExist = await User.findOne({ email: email })
-    if (isExist) return res.status(409).json({ message: "User Already exists" })
+    if (isExist) {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(409).json({ message: "User Already exists" })
+    }
 
     const reqfiles = req.file
+
     console.log(reqfiles)
-    const fileUrl = `/uploads/images/${req.file.filename}`
+    const fileUrl = `/uploads/images/${req.file?.filename}`
 
     const user = await User.create({
       email,
@@ -38,7 +46,8 @@ const userRegister = async (req, res) => {
     const createdUser = await User.findById(user._id).select("-password -refresh_token")
 
     if (!createdUser) {
-      res.status(500).json({
+      fs.unlinkSync(req.file?.path)
+      return res.status(500).json({
         message: "something went wrong"
       })
     }
@@ -50,7 +59,14 @@ const userRegister = async (req, res) => {
 
 
   } catch (error) {
+
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
     console.log("Eror in register", error)
+    return res.status(500).json({
+      message: "Something went wrong"
+    })
   }
 }
 

@@ -53,7 +53,7 @@ const getAllOrder = async (req, res) => {
       return res.status(403).json({ message: "forbidden request" })
     }
 
-    const orders = await Order.find().populate("created_by")
+    const orders = await Order.find().populate("created_by", "fullname ")
 
     console.log('orders', orders)
 
@@ -69,9 +69,33 @@ const getAllOrder = async (req, res) => {
   }
 }
 
+const getOrderByUser = async (req, res) => {
+
+  try {
+    const user = await User.findById(req.user._id)
+    if (!user || !user.isAdmin) {
+      return res.status(401).json("Unauthorized request")
+    }
+    const orders = await Order.find({ created_by: req.user._id }).populate("created_by", "fullname ")
+    if (!orders.length) {
+      console.log('error while fetching orders')
+      return res.status(404).json({ message: "No orders found" })
+    }
+
+    return res.status(200).json({
+      data: orders,
+      message: "Orders fetched "
+    })
+  } catch (error) {
+    console.log('error while fetching order by user', error)
+    res.stauts(500).json("Something went wrong")
+  }
+}
+
 
 
 export {
   createOrder,
-  getAllOrder
+  getAllOrder,
+  getOrderByUser
 }
