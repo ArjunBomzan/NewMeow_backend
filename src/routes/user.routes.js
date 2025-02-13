@@ -17,14 +17,24 @@ const registerValidationSchema = Joi.object({
 })
 
 
-router.route('/register').post(upload.single("profile_pic"), validate.body(registerValidationSchema), (req, res, next) => {
-  const imagePath = path.join(path.resolve(), product.image)
-  fs.unlink(imagePath, (err) => {
-    if (err) {
-      console.error('Error deleting file:', err)
+router.route('/register').post(upload.single("profile_pic"), async (req, res, next) => {
+  try {
+    await registerValidationSchema.validateAsync(req.body);
+    next();
+  } catch (error) {
+    console.error("Validation Error:", error.message);
+
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
     }
-  })
-  next()
+
+    const errorMessage = error.details.map((err) => err.message.replaceAll('"', ''))
+    return res.status(400).json({
+      message: errorMessage
+    });
+  }
 }, userRegister)
 router.route('/login').post(userLogin)
 router.route('/logout').post(VerifyToken, userLogout)
