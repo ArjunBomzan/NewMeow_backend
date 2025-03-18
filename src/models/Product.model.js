@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const categories = ['Men', 'Women', 'Children']
+const categories = ['Citrus Fruit', 'Berries', 'Tropical fruits']
 const productSchema = new mongoose.Schema({
   title: {
     type: String,

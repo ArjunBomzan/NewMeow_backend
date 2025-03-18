@@ -73,7 +73,7 @@ const getOrderByUser = async (req, res) => {
 
   try {
     const user = await User.findById(req.user._id)
-    if (!user || !user.isAdmin) {
+    if (!user) {
       return res.status(401).json("Unauthorized request")
     }
     const orders = await Order.find({ created_by: req.user._id }).populate("created_by", "fullname ")
