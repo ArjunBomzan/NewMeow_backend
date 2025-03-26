@@ -76,6 +76,29 @@ const fetchProducts = async (req, res) => {
 
 }
 
+
+const fetchSingleProduct = async (req, res) => {
+  try {
+
+    const product = await Product.findById(req.params.id)
+    console.log('prod', product)
+    console.log('params', req.params)
+    if (!product) {
+      return res.status(404).json({
+        message: "could not find the product"
+      })
+    }
+    return res.status(200).json({
+      message: "product found",
+      data: product
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: "could not fetch the product "
+    })
+  }
+}
+
 const deleteProduct = async (req, res) => {
   try {
 
@@ -113,4 +136,4 @@ const deleteProduct = async (req, res) => {
 
 
 
-export { addProduct, fetchProducts, deleteProduct }
+export { addProduct, fetchProducts, deleteProduct, fetchSingleProduct }
