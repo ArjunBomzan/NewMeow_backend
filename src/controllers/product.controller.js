@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 
 const addProduct = async (req, res) => {
+  console.log(req)
   try {
     const { title, description, price, in_stock, Categories, rating } = req.body;
     console.log('files', req.file)

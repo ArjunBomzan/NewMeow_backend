@@ -3,9 +3,12 @@ import { User } from "../models/User.model.js"
 
 export const VerifyToken = async (req, res, next) => {
   try {
-    const token = req.cookies?.accessToken
+    const authHeader = req.header("Authorization");
+    const token = req.cookies?.accessToken ||
+      (authHeader && authHeader.replace('Bearer ', ''));
+
     if (!token) {
-      res.status(401).json({
+      return res.status(401).json({
         message: "Unauthorized request"
       })
     }
@@ -15,7 +18,7 @@ export const VerifyToken = async (req, res, next) => {
     const user = await User.findById(decodedToken?._id).select("-password -refresh_token")
 
     if (!user) {
-      res.status(404).json({
+      return res.status(404).json({
         message: "User not found"
       })
     }
@@ -23,7 +26,8 @@ export const VerifyToken = async (req, res, next) => {
     req.user = user
     next()
   } catch (error) {
-    res.status(401).json({
+    console.log("lado", error)
+    return res.status(401).json({
       message: error.message
     })
   }
