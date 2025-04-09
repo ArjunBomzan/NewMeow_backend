@@ -5,7 +5,7 @@ import { User } from "../models/User.model.js"
 
 const createOrder = async (req, res) => {
   try {
-    console.log("code was here")
+
     const Admin = await User.findById(req.user._id)
     console.log(Admin)
     if (Admin.isAdmin) {

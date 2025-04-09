@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import { Product } from '../models/Product.model.js'
 import { User } from '../models/User.model.js'
 import fs from 'fs'
@@ -49,11 +50,11 @@ const fetchProducts = async (req, res) => {
 
     let perPage = parseInt(req.query.perPage) || 5
     let page = parseInt(req.query.page) || 1
-    let category = req.query.category
+    let Categories = req.query.Categories
 
     let productFilter = {}
-    if (category) {
-      productFilter.Categories = category
+    if (Categories) {
+      productFilter.Categories = Categories
 
     }
 
@@ -99,6 +100,47 @@ const fetchSingleProduct = async (req, res) => {
     })
   }
 }
+
+
+export const updateProduct = async (req, res) => {
+  const { title, description, price, Categories } = req.body;
+  const { id } = req.params;
+
+  try {
+    if (!mongoose.isValidObjectId(id)) return res.status(400).json({ message: 'invalid id' });
+
+    const product = await Product.findById(id);
+    if (!product) return res.status(404).json({ message: 'product not found' });
+
+
+    if (title !== undefined) product.title = title;
+    if (description !== undefined) product.description = description;
+    if (price !== undefined) product.price = price;
+    if (Categories !== undefined) product.Categories = Categories;
+
+
+    if (req.file) {
+
+      try {
+        await fs.promises.unlink(`.${product.image}`);
+      } catch (err) {
+
+        if (err.code !== 'ENOENT') throw err;
+      }
+      product.image = `/public/images/${req.file.filename}`;
+    }
+
+    await product.save();
+    return res.status(200).json({
+      data: product,
+      message: "Product updated successfully"
+    });
+
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+}
+
 
 const deleteProduct = async (req, res) => {
   try {
