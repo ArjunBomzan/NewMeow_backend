@@ -25,6 +25,8 @@ const orderSchema = new mongoose.Schema(
             min: 1,
             required: true
           },
+
+
           status: {
             type: String,
             enum: ['PENDING', 'COMPLETED', 'REJECTED'],
@@ -43,7 +45,14 @@ const orderSchema = new mongoose.Schema(
 
 
     },
-
+    shipping_address: {
+      type: String,
+      required: true
+    },
+    city: {
+      type: String,
+      required: true
+    },
     created_by: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

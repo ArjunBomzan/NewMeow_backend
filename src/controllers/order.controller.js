@@ -21,7 +21,8 @@ const createOrder = async (req, res) => {
         product_id: dbProduct._id,
         name: dbProduct.title,
         price: dbProduct.price,
-        quantity: product.quantity || 1
+        quantity: product.quantity || 1,
+
       })
 
 
@@ -31,7 +32,9 @@ const createOrder = async (req, res) => {
 
     const order = await Order.create({
       products: mapped_products,
-      created_by: req.user._id
+      created_by: req.user._id,
+      shipping_address: req.body.shipping_address,
+      city: req.body.city
     })
 
     return res.status(201).json({
